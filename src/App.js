@@ -1,25 +1,39 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Chat from './Chat/Chat';
+
+
+
+
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      name: '',
+      room: ''
+    }
+    this.prevRoom = null
+  }
+  handleJoinRoom = () => {
+    this.props.socket.emit('join-room', { prev: this.prevRoom, room: this.state.room })
+    this.prevRoom = this.state.room
+  }
+  handleChangeRoom = (event) => {
+    this.setState({
+      room: event.target.value,
+    })
+  }
+  render() {
+    return (
+      <div className="App">
+        <input type="text" value={this.state.name} onChange={(event) => this.setState({ name: event.target.value })} placeholder='name...' />
+        <input type="text" value={this.state.room} onChange={(event) => this.handleChangeRoom(event)} placeholder='number room chat ...' />
+        <button onClick={() => this.handleJoinRoom()}>connect</button>
+        <Chat socket={this.props.socket} room={this.state.room} name={this.state.name} />
+      </div>
+    );
+  }
 }
 
 export default App;

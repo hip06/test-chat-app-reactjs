@@ -1,0 +1,26 @@
+#box-chat {
+    border: 1px solid red;
+    height: 500px;
+    width: 400px;
+    position: relative;
+
+    .receive-message,
+    .send-message {
+        display: inline-block;
+        background-color: rgb(124, 169, 226);
+        height: 24px;
+        line-height: 24px;
+        width: fit-content;
+        border-radius: 5px;
+        padding: 4px 16px;
+        margin: 8px 0;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .left {
+        text-align: left;
+    }
+}
