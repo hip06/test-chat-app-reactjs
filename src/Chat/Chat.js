@@ -12,23 +12,8 @@ class Chat extends React.Component {
     }
     componentDidMount() {
         this.props.socket.off('receive-message').on('receive-message', (data) => {
-            const boxMessage = document.getElementById('box-chat')
-            let wrapItem = document.createElement('div')
-            let item = document.createElement('span')
-            let small = document.createElement('small')
-            wrapItem.appendChild(item)
-            wrapItem.appendChild(small)
-            wrapItem.classList.add('left')
-            item.classList.add("receive-message")
-            item.textContent = data.message
-            small.textContent = data.time
-            boxMessage.appendChild(wrapItem)
+            this.createMessageUI("receive-message", 'left', data.message, data.time)
         })
-    }
-    componentDidUpdate(prevProps, prevState) {
-        // if (prevState.message !== this.state.message) {
-        //     (document.querySelector('#box-chat')).appendChild(document.createElement('li').textContent(this.state.message))
-        // }
     }
     handleSendMessage = async () => {
         let payload = {
@@ -38,31 +23,45 @@ class Chat extends React.Component {
             time: `${new Date(Date.now()).getHours()}:${new Date(Date.now()).getMinutes()}`
         }
         await this.props.socket.emit('send-message', payload)
+        this.createMessageUI('send-message', "right", this.state.message, payload.time, true)
+        this.setState({
+            message: ''
+        })
+    }
+    createMessageUI = (cssbox, position, message, time, isSend) => {
         const boxMessage = document.getElementById('box-chat')
         let wrapItem = document.createElement('div')
         let item = document.createElement('span')
         let small = document.createElement('small')
-        wrapItem.appendChild(small)
-        wrapItem.appendChild(item)
-        wrapItem.classList.add('right')
-        item.classList.add('send-message', "right")
-        item.textContent = this.state.message
-        small.textContent = payload.time
+        if (isSend) {
+            wrapItem.appendChild(small)
+            wrapItem.appendChild(item)
+        } else {
+            wrapItem.appendChild(item)
+            wrapItem.appendChild(small)
+        }
+        wrapItem.classList.add(position)
+        item.classList.add(cssbox, position)
+        item.textContent = message
+        small.textContent = time
         boxMessage.appendChild(wrapItem)
-
-        this.setState({
-            message: ''
-        })
+    }
+    handleSend = (event) => {
+        if (event.code === 'Enter') {
+            this.handleSendMessage()
+        }
     }
     render() {
         return (
             <div className="Chat">
                 <h1>Chat room</h1>
-                <input type="text" value={this.state.message} onChange={(event) => this.setState({ message: event.target.value })} />
-                <button onClick={() => this.handleSendMessage()}>send</button>
-                <div id='box-chat'>
-
+                <div id='box-chat'></div>
+                <div className="input-message">
+                    <input className='text' type="text" value={this.state.message} onChange={(event) => this.setState({ message: event.target.value })}
+                        onKeyUp={(event) => this.handleSend(event)} />
+                    <button className='btn' onClick={() => this.handleSendMessage()}>send</button>
                 </div>
+
             </div>
         );
     }
